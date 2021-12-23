@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.inventory.detail.InventoryDetailFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/spacing_standard">
+
+        <TextView
+            android:id="@+id/lbl_product_name"
+            style="@style/Widget.CommentSold.TextView.ProductDetailHeading"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_standard"
+            android:gravity="center"
+            android:text="@string/product_name"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/txt_product_name"
+            style="@style/Widget.CommentSold.TextView.ProductDetailDesc"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lbl_product_name"
+            tools:text="Product Name" />
+
+        <TextView
+            android:id="@+id/lbl_color"
+            style="@style/Widget.CommentSold.TextView.ProductDetailHeading"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_standard"
+            android:gravity="center"
+            android:text="@string/color"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_product_name" />
+
+        <TextView
+            android:id="@+id/txt_color"
+            style="@style/Widget.CommentSold.TextView.ProductDetailDesc"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lbl_color"
+            tools:text="Color" />
+
+        <TextView
+            android:id="@+id/lbl_size"
+            style="@style/Widget.CommentSold.TextView.ProductDetailHeading"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_standard"
+            android:gravity="center"
+            android:text="@string/size"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_color" />
+
+        <TextView
+            android:id="@+id/txt_size"
+            style="@style/Widget.CommentSold.TextView.ProductDetailDesc"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lbl_size"
+            tools:text="Size" />
+
+        <TextView
+            android:id="@+id/lbl_quantity"
+            style="@style/Widget.CommentSold.TextView.ProductDetailHeading"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_standard"
+            android:gravity="center"
+            android:text="@string/quantity"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_size" />
+
+        <TextView
+            android:id="@+id/txt_quantity"
+            style="@style/Widget.CommentSold.TextView.ProductDetailDesc"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lbl_quantity"
+            tools:text="Quantity" />
+
+        <TextView
+            android:id="@+id/lbl_weight"
+            style="@style/Widget.CommentSold.TextView.ProductDetailHeading"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_standard"
+            android:gravity="center"
+            android:text="@string/weight"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_quantity" />
+
+        <TextView
+            android:id="@+id/txt_weight"
+            style="@style/Widget.CommentSold.TextView.ProductDetailDesc"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lbl_weight"
+            tools:text="Weight" />
+
+        <TextView
+            android:id="@+id/lbl_price"
+            style="@style/Widget.CommentSold.TextView.ProductDetailHeading"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_standard"
+            android:gravity="center"
+            android:text="@string/price"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_weight" />
+
+        <TextView
+            android:id="@+id/txt_price"
+            style="@style/Widget.CommentSold.TextView.ProductDetailDesc"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lbl_price"
+            tools:text="Price" />
+
+        <TextView
+            android:id="@+id/lbl_sale_price"
+            style="@style/Widget.CommentSold.TextView.ProductDetailHeading"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_standard"
+            android:gravity="center"
+            android:text="@string/sale_price"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_price" />
+
+        <TextView
+            android:id="@+id/txt_sale_price"
+            style="@style/Widget.CommentSold.TextView.ProductDetailDesc"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lbl_sale_price"
+            tools:text="Sale Price" />
+
+        <TextView
+            android:id="@+id/lbl_cost_price"
+            style="@style/Widget.CommentSold.TextView.ProductDetailHeading"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_standard"
+            android:gravity="center"
+            android:text="@string/cost_price"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_sale_price" />
+
+        <TextView
+            android:id="@+id/txt_cost_price"
+            style="@style/Widget.CommentSold.TextView.ProductDetailDesc"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lbl_cost_price"
+            tools:text="Cost Price" />
+
+        <TextView
+            android:id="@+id/lbl_dimensions"
+            style="@style/Widget.CommentSold.TextView.ProductDetailHeading"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_standard"
+            android:gravity="center"
+            android:text="@string/dimension"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_cost_price" />
+
+        <TextView
+            android:id="@+id/txt_dimensions"
+            style="@style/Widget.CommentSold.TextView.ProductDetailDesc"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lbl_dimensions"
+            tools:text="l x w x h" />
+
+        <TextView
+            android:id="@+id/lbl_note"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/inventory_note"
+            style="@style/Widget.CommentSold.TextView.ProductDetailHeading"
+            android:layout_marginTop="@dimen/spacing_standard"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_dimensions"
+            />
+        <TextView
+            android:id="@+id/txt_note"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            style="@style/Widget.CommentSold.TextView.ProductDetailDesc"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lbl_note"
+            tools:text="Note" />
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_standard"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

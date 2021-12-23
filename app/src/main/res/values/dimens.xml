@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="spacing_standard">16dp</dimen>
+    <dimen name="spacing_small">8dp</dimen>
+    <dimen name="product_grid_image_height">200dp</dimen>
+    <dimen name="product_grid_heading_padding">8dp</dimen>
+    <dimen name="product_grid_desc_padding">4dp</dimen>
+    <dimen name="product_grid_item_margin">4dp</dimen>
+    <dimen name="product_grid_heading_txt_size">20sp</dimen>
+    <dimen name="product_grid_desc_txt_size">16sp</dimen>
+    <dimen name="product_detail_image_height">300dp</dimen>
+    <dimen name="product_detail_lbl_size">20sp</dimen>
+    <dimen name="product_detail_txt_size">16sp</dimen>
+</resources>

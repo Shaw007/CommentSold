@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/splashFragment">
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.srmstudios.commentsold.ui.login.LoginFragment"
+        android:label="@string/login"
+        tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_loginFragment_to_productsFragment"
+            app:destination="@id/productsFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/productsFragment"
+        android:name="com.srmstudios.commentsold.ui.product.list.ProductsFragment"
+        android:label="@string/products"
+        tools:layout="@layout/fragment_products">
+        <action
+            android:id="@+id/action_productsFragment_to_productDetailFragment"
+            app:destination="@id/productDetailFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/action_productsFragment_to_createEditProductFragment"
+            app:destination="@id/createEditProductFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/action_productsFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out"
+            app:popUpTo="@id/nav_graph" />
+    </fragment>
+    <fragment
+        android:id="@+id/productDetailFragment"
+        android:name="com.srmstudios.commentsold.ui.product.detail.ProductDetailFragment"
+        android:label="{title}"
+        tools:layout="@layout/fragment_product_detail">
+        <argument
+            android:name="title"
+            app:argType="string" />
+        <argument
+            android:name="product"
+            app:argType="com.srmstudios.commentsold.ui.model.Product" />
+        <action
+            android:id="@+id/action_productDetailFragment_to_createEditProductFragment"
+            app:destination="@id/createEditProductFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+    </fragment>
+    <fragment
+        android:id="@+id/createEditProductFragment"
+        android:name="com.srmstudios.commentsold.ui.product.create_edit.CreateEditProductFragment"
+        android:label="{title}"
+        tools:layout="@layout/fragment_create_edit_product">
+        <argument
+            android:name="title"
+            app:argType="string" />
+        <argument
+            android:name="product"
+            app:argType="com.srmstudios.commentsold.ui.model.Product"
+            app:nullable="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/splashFragment"
+        android:name="com.srmstudios.commentsold.ui.splash.SplashFragment"
+        android:label="fragment_splash"
+        tools:layout="@layout/fragment_splash">
+        <action
+            android:id="@+id/action_splashFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/splashFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_splashFragment_to_productsFragment"
+            app:destination="@id/productsFragment"
+            app:popUpTo="@id/splashFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/inventoryFragment"
+        android:name="com.srmstudios.commentsold.ui.inventory.list.InventoryFragment"
+        android:label="@string/inventory"
+        tools:layout="@layout/fragment_inventory">
+        <action
+            android:id="@+id/action_inventoryFragment_to_inventoryDetailFragment"
+            app:destination="@id/inventoryDetailFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/action_inventoryFragment_to_createEditInventoryFragment"
+            app:destination="@id/createEditInventoryFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+    </fragment>
+    <fragment
+        android:id="@+id/inventoryDetailFragment"
+        android:name="com.srmstudios.commentsold.ui.inventory.detail.InventoryDetailFragment"
+        android:label="{title}"
+        tools:layout="@layout/fragment_inventory_detail">
+        <argument android:name="title" />
+        <argument
+            android:name="inventory"
+            app:argType="com.srmstudios.commentsold.ui.model.Inventory" />
+        <action
+            android:id="@+id/action_inventoryDetailFragment_to_createEditInventoryFragment"
+            app:destination="@id/createEditInventoryFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+    </fragment>
+    <fragment
+        android:id="@+id/createEditInventoryFragment"
+        android:name="com.srmstudios.commentsold.ui.inventory.create_edit.CreateEditInventoryFragment"
+        android:label="{title}"
+        tools:layout="@layout/fragment_create_edit_inventory">
+        <argument
+            android:name="title"
+            app:argType="string" />
+        <argument
+            android:name="inventory"
+            app:argType="com.srmstudios.commentsold.ui.model.Inventory"
+            app:nullable="true" />
+    </fragment>
+</navigation>
