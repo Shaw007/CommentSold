@@ -53,7 +53,7 @@ class ProductsFragment : Fragment(R.layout.fragment_products),
                 findNavController().navigate(
                     ProductsFragmentDirections.actionProductsFragmentToProductDetailFragment(
                         product.productName ?: getString(R.string.product_details),
-                        product.toProduct()
+                        product
                     )
                 )
             }

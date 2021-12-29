@@ -8,16 +8,16 @@ import androidx.paging.LoadStateAdapter
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.srmstudios.commentsold.data.network.model.ProductResponse
 import com.srmstudios.commentsold.databinding.ItemLoadingBinding
 import com.srmstudios.commentsold.databinding.ItemProductBinding
+import com.srmstudios.commentsold.ui.model.Product
 import com.srmstudios.commentsold.util.Util
 import com.srmstudios.commentsold.util.convertCentsToDollars
 
 class ProductAdapter(
-    private val itemClickListener: (ProductResponse?) -> Unit
+    private val itemClickListener: (Product?) -> Unit
 ) :
-    PagingDataAdapter<ProductResponse, RecyclerView.ViewHolder>(ProductDillUtil()) {
+    PagingDataAdapter<Product, RecyclerView.ViewHolder>(ProductDillUtil()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         ProductViewHolder(
@@ -48,7 +48,7 @@ class ProductAdapter(
             }
         }
 
-        fun bind(product: ProductResponse?) {
+        fun bind(product: Product?) {
             product?.let { product ->
                 binding.apply {
                     txtTitle.text = product.productName ?: ""
@@ -60,11 +60,11 @@ class ProductAdapter(
         }
     }
 
-    class ProductDillUtil : DiffUtil.ItemCallback<ProductResponse>() {
-        override fun areItemsTheSame(oldItem: ProductResponse, newItem: ProductResponse) =
+    class ProductDillUtil : DiffUtil.ItemCallback<Product>() {
+        override fun areItemsTheSame(oldItem: Product, newItem: Product) =
             oldItem.id == newItem.id
 
-        override fun areContentsTheSame(oldItem: ProductResponse, newItem: ProductResponse) =
+        override fun areContentsTheSame(oldItem: Product, newItem: Product) =
             oldItem == newItem
     }
 }

@@ -1,10 +1,9 @@
 package com.srmstudios.commentsold.ui.view_model
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.paging.cachedIn
+import androidx.paging.map
+import com.srmstudios.commentsold.data.network.model.toProduct
 import com.srmstudios.commentsold.data.repo.InventoryRepository
 import com.srmstudios.commentsold.data.repo.ProductRepository
 import com.srmstudios.commentsold.util.CommentSoldPrefsManager
@@ -28,7 +27,11 @@ class ProductViewModel @Inject constructor(
         get() = _message
 
     val products = productRepository.getProducts()
-        .cachedIn(viewModelScope)
+        .map { pagingData ->
+            pagingData.map { productResponse ->
+                productResponse.toProduct()
+            }
+        }.cachedIn(viewModelScope)
 
     fun logout() = viewModelScope.launch {
         productRepository.deleteAllProductsFromDB()
