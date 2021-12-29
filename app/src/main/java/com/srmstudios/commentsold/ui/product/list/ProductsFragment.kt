@@ -10,16 +10,19 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.srmstudios.commentsold.R
-import com.srmstudios.commentsold.data.database.entity.toProducts
+import com.srmstudios.commentsold.data.network.model.toProduct
 import com.srmstudios.commentsold.databinding.FragmentProductsBinding
 import com.srmstudios.commentsold.ui.adapter.ProductAdapter
+import com.srmstudios.commentsold.ui.adapter.ProductLoadStateAdapter
 import com.srmstudios.commentsold.ui.view_model.ProductViewModel
-import com.srmstudios.commentsold.util.Resource
+import com.srmstudios.commentsold.util.NUM_COLUMNS_PRODUCTS
+import com.srmstudios.commentsold.util.Util
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
@@ -27,7 +30,9 @@ class ProductsFragment : Fragment(R.layout.fragment_products),
     SwipeRefreshLayout.OnRefreshListener {
     private lateinit var binding: FragmentProductsBinding
     private lateinit var adapter: ProductAdapter
+    private lateinit var gridLayoutManager: GridLayoutManager
     private val viewModel: ProductViewModel by viewModels()
+    @Inject lateinit var util: Util
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,22 +49,34 @@ class ProductsFragment : Fragment(R.layout.fragment_products),
 
     private fun setupViews() {
         adapter = ProductAdapter { product ->
-            findNavController().navigate(
-                ProductsFragmentDirections.actionProductsFragmentToProductDetailFragment(
-                    product.productName ?: getString(R.string.product_details),
-                    product
+            product?.let { product ->
+                findNavController().navigate(
+                    ProductsFragmentDirections.actionProductsFragmentToProductDetailFragment(
+                        product.productName ?: getString(R.string.product_details),
+                        product.toProduct()
+                    )
                 )
-            )
+            }
         }
 
         binding.apply {
-            swipeRefreshLayout.setOnRefreshListener(this@ProductsFragment)
-            recyclerViewProducts.setHasFixedSize(true)
-            recyclerViewProducts.adapter = adapter
-        }
+            val footerAdapter = ProductLoadStateAdapter(util) { adapter.retry() }
 
-        viewModel.progressBarPagination.observe(viewLifecycleOwner) { visibility ->
-            binding.progressBarPagination.isVisible = visibility
+            gridLayoutManager = GridLayoutManager(context,NUM_COLUMNS_PRODUCTS)
+            recyclerViewProducts.layoutManager = gridLayoutManager
+            recyclerViewProducts.setHasFixedSize(true)
+            recyclerViewProducts.adapter = adapter.withLoadStateFooter(footer = footerAdapter)
+
+            gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+                override fun getSpanSize(position: Int): Int {
+                    return if (position == adapter.itemCount && footerAdapter.itemCount > 0) {
+                        NUM_COLUMNS_PRODUCTS
+                    } else {
+                        // Loading View
+                        1
+                    }
+                }
+            }
         }
 
         viewModel.message.observe(viewLifecycleOwner) { message ->
@@ -76,42 +93,57 @@ class ProductsFragment : Fragment(R.layout.fragment_products),
             }
         }
 
-        viewModel.products.observe(viewLifecycleOwner) { result ->
-            result.data?.let { products ->
-                adapter.submitList(products.toProducts())
-            }
-
-            binding.apply {
-                swipeRefreshLayout.isRefreshing =
-                    result is Resource.Loading && result.data.isNullOrEmpty()
-
-                val showErrorViews = result is Resource.Error && result.data.isNullOrEmpty()
-                txtErrorMessage.isVisible = showErrorViews
-                btnRetry.isVisible = showErrorViews
-                txtErrorMessage.text = result.error?.message
-            }
+        viewModel.products.observe(viewLifecycleOwner) { productsPagingData ->
+            adapter.submitData(viewLifecycleOwner.lifecycle,productsPagingData)
         }
     }
 
     private fun setupListeners() {
-        binding.btnRetry.setOnClickListener {
-            viewModel.fetchProducts()
+        binding.apply {
+            btnRetry.setOnClickListener {
+                // start fetching fresh products
+                adapter.refresh()
+            }
+
+            swipeRefreshLayout.setOnRefreshListener(this@ProductsFragment)
         }
 
-        binding.recyclerViewProducts.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                val layoutManager = recyclerView.layoutManager as GridLayoutManager
-                val lastPosition = layoutManager.findLastVisibleItemPosition()
-                if (adapter.itemCount > 0 && lastPosition == adapter.itemCount - 1) {
-                    viewModel.loadMore()
+        adapter.addLoadStateListener { loadState ->
+            binding.apply {
+
+                // this means that initial data load call is in progress
+                swipeRefreshLayout.isRefreshing = loadState.source.refresh is LoadState.Loading
+
+                // this means that loading has finished and there is no error
+                // so we need to make the recyclerview visible
+                recyclerViewProducts.isVisible = loadState.source.refresh is LoadState.NotLoading
+
+                // this means that some error has occurred in the initial data load call
+                val hasErrorOccurred = loadState.source.refresh is LoadState.Error
+                btnRetry.isVisible = hasErrorOccurred
+                txtErrorMessage.isVisible = hasErrorOccurred
+                if(hasErrorOccurred) {
+                    txtErrorMessage.text = util.parseApiErrorThrowable((loadState.source.refresh as LoadState.Error).error)
+                }
+
+                // this means there are no products found in the initial data load call
+                if (loadState.source.refresh is LoadState.NotLoading &&
+                    adapter.itemCount == 0
+                ) {
+                    recyclerViewProducts.isVisible = false
+                    btnRetry.isVisible = true
+                    txtErrorMessage.isVisible = true
+                    txtErrorMessage.text = getString(R.string.no_products_found)
                 }
             }
-        })
+        }
     }
 
     // pull to refresh
     override fun onRefresh() {
-        binding.swipeRefreshLayout.isRefreshing = viewModel.fetchProducts()
+        // start fetching fresh products
+        adapter.refresh()
+        binding.swipeRefreshLayout.isRefreshing = false
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

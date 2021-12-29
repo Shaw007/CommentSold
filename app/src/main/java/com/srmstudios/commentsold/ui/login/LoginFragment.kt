@@ -27,13 +27,13 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
     private fun setupViews(){
         // Testing Credentials
-        /*binding.apply {
-            edtEmail.setText("hortensia.dollison@blargmail.org")
-            edtPassword.setText("AgcGcJxeig")
+        binding.apply {
+            //edtEmail.setText("hortensia.dollison@blargmail.org")
+            //edtPassword.setText("AgcGcJxeig")
 
             edtEmail.setText("tamar.poyer@barmail.com")
             edtPassword.setText("hdSEjsQWxg")
-        }*/
+        }
     }
 
     private fun setupListeners() {

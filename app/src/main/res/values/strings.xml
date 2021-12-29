@@ -73,4 +73,5 @@
     <string name="something_went_wrong">Something went wrong</string>
     <string name="user_not_found">User not found</string>
     <string name="weak_internet_connection">Weak internet connection</string>
+    <string name="no_products_found">No Products Found</string>
 </resources>

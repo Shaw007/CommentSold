@@ -19,6 +19,7 @@ const val QUERY_PARAM_SIZE = "size"
 const val QUERY_PARAM_QUANTITY = "quantity"
 const val PAGE_SIZE_PRODUCTS = 20
 const val FIRST_PAGE_PRODUCTS_OFFSET = 0
+const val NUM_COLUMNS_PRODUCTS = 2
 const val PAGE_SIZE_INVENTORY = 20
 const val FIRST_PAGE_INVENTORY_OFFSET = 0
 

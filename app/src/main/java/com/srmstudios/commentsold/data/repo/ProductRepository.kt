@@ -1,12 +1,20 @@
 package com.srmstudios.commentsold.data.repo
 
+import androidx.lifecycle.LiveData
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.liveData
 import com.srmstudios.commentsold.data.database.CommentSoldDatabase
 import com.srmstudios.commentsold.data.database.entity.DatabaseProduct
 import com.srmstudios.commentsold.data.network.ICommentSoldApi
 import com.srmstudios.commentsold.data.network.model.CreateUpdateProductRequest
+import com.srmstudios.commentsold.data.network.model.ProductResponse
 import com.srmstudios.commentsold.data.network.model.toDatabaseProducts
+import com.srmstudios.commentsold.data.paging.ProductsPagingSource
 import com.srmstudios.commentsold.di.CommentSoldAuthApi
 import com.srmstudios.commentsold.util.FIRST_PAGE_PRODUCTS_OFFSET
+import com.srmstudios.commentsold.util.PAGE_SIZE_PRODUCTS
 import com.srmstudios.commentsold.util.Resource
 import com.srmstudios.commentsold.util.networkBoundResource
 import kotlinx.coroutines.Dispatchers
@@ -20,37 +28,14 @@ class ProductRepository @Inject constructor(
     private val commentSoldDatabase: CommentSoldDatabase
 ) {
 
-    fun getProducts() = networkBoundResource(
-        query = {
-            // query local database
-            commentSoldDatabase.productDao().getProducts()
-        },
-        fetch = {
-            // fetch products from network
-            iCommentSoldApi.getProductsList(page = FIRST_PAGE_PRODUCTS_OFFSET)
-        },
-        saveFetchResult = {
-            // save fetched products from the network to local database
-            it.products?.let { products ->
-                // delete all existing cached products from the database
-                // and insert new data
-                deleteAllProductsFromDB()
-                commentSoldDatabase.productDao().insert(products.toDatabaseProducts())
-            }
-        }
-    )
-
-    fun loadMoreProducts(page: Int) = flow {
-        try {
-            emit(Resource.Loading(null))
-            val response = iCommentSoldApi.getProductsList(page = page)
-            response.products?.let { products ->
-                commentSoldDatabase.productDao().insert(products.toDatabaseProducts())
-            }
-            emit(Resource.Success(response))
-        } catch (ex: Throwable) {
-            emit(Resource.Error(ex, null))
-        }
+    fun getProducts(): LiveData<PagingData<ProductResponse>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = PAGE_SIZE_PRODUCTS,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { ProductsPagingSource(iCommentSoldApi) }
+        ).liveData
     }
 
     fun getProduct(id: Int) = commentSoldDatabase.productDao().getProductById(id)

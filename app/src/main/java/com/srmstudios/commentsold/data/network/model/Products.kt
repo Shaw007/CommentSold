@@ -2,10 +2,11 @@ package com.srmstudios.commentsold.data.network.model
 
 import com.google.gson.annotations.SerializedName
 import com.srmstudios.commentsold.data.database.entity.DatabaseProduct
+import com.srmstudios.commentsold.ui.model.Product
 
 data class ProductsListMainResponse(
     @SerializedName("count") var count: Int? = null,
-    @SerializedName("products") var products: List<ProductResponse>? = null,
+    @SerializedName("products") var products: List<ProductResponse> = listOf(),
     @SerializedName("total") var total: Int? = null
 )
 
@@ -23,6 +24,23 @@ data class ProductResponse(
     @SerializedName("note") var note: String? = null,
     @SerializedName("admin_id") var adminId: Int? = null
 )
+
+fun ProductResponse.toProduct(): Product {
+    return Product(
+        id = id,
+        productName = productName,
+        description = description,
+        style = style,
+        brand = brand,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+        url = url,
+        productType = productType,
+        shippingPrice = shippingPrice,
+        note = note,
+        adminId = adminId
+    )
+}
 
 data class CreateUpdateProductRequest(
     @SerializedName("name") var name: String? = null,
