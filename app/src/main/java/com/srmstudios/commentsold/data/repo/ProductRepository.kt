@@ -1,22 +1,15 @@
 package com.srmstudios.commentsold.data.repo
 
 import androidx.lifecycle.LiveData
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.liveData
+import androidx.paging.*
 import com.srmstudios.commentsold.data.database.CommentSoldDatabase
 import com.srmstudios.commentsold.data.database.entity.DatabaseProduct
 import com.srmstudios.commentsold.data.network.ICommentSoldApi
 import com.srmstudios.commentsold.data.network.model.CreateUpdateProductRequest
-import com.srmstudios.commentsold.data.network.model.ProductResponse
-import com.srmstudios.commentsold.data.network.model.toDatabaseProducts
-import com.srmstudios.commentsold.data.paging.ProductsPagingSource
+import com.srmstudios.commentsold.data.paging.ProductRemoteMediator
 import com.srmstudios.commentsold.di.CommentSoldAuthApi
-import com.srmstudios.commentsold.util.FIRST_PAGE_PRODUCTS_OFFSET
 import com.srmstudios.commentsold.util.PAGE_SIZE_PRODUCTS
 import com.srmstudios.commentsold.util.Resource
-import com.srmstudios.commentsold.util.networkBoundResource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
@@ -28,13 +21,20 @@ class ProductRepository @Inject constructor(
     private val commentSoldDatabase: CommentSoldDatabase
 ) {
 
-    fun getProducts(): LiveData<PagingData<ProductResponse>> {
+    fun getProducts(): LiveData<PagingData<DatabaseProduct>> {
+        val pagingSourceFactory =  { commentSoldDatabase.productDao().getProducts()}
+
+        @OptIn(ExperimentalPagingApi::class)
         return Pager(
             config = PagingConfig(
                 pageSize = PAGE_SIZE_PRODUCTS,
                 enablePlaceholders = false
             ),
-            pagingSourceFactory = { ProductsPagingSource(iCommentSoldApi) }
+            remoteMediator = ProductRemoteMediator(
+                iCommentSoldApi,
+                commentSoldDatabase
+            ),
+            pagingSourceFactory = pagingSourceFactory
         ).liveData
     }
 
@@ -139,6 +139,10 @@ class ProductRepository @Inject constructor(
 
     suspend fun deleteAllProductsFromDB() = withContext(Dispatchers.IO) {
         commentSoldDatabase.productDao().deleteAllProducts()
+    }
+
+    suspend fun deleteAllRemoteKeysProductsFromDB() = withContext(Dispatchers.IO) {
+        commentSoldDatabase.remoteKeysProductDao().clearRemoteKeys()
     }
 }
 

@@ -14,7 +14,6 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.srmstudios.commentsold.R
-import com.srmstudios.commentsold.data.network.model.toProduct
 import com.srmstudios.commentsold.databinding.FragmentProductsBinding
 import com.srmstudios.commentsold.ui.adapter.ProductAdapter
 import com.srmstudios.commentsold.ui.adapter.ProductLoadStateAdapter
@@ -32,7 +31,9 @@ class ProductsFragment : Fragment(R.layout.fragment_products),
     private lateinit var adapter: ProductAdapter
     private lateinit var gridLayoutManager: GridLayoutManager
     private val viewModel: ProductViewModel by viewModels()
-    @Inject lateinit var util: Util
+
+    @Inject
+    lateinit var util: Util
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +63,7 @@ class ProductsFragment : Fragment(R.layout.fragment_products),
         binding.apply {
             val footerAdapter = ProductLoadStateAdapter(util) { adapter.retry() }
 
-            gridLayoutManager = GridLayoutManager(context,NUM_COLUMNS_PRODUCTS)
+            gridLayoutManager = GridLayoutManager(context, NUM_COLUMNS_PRODUCTS)
             recyclerViewProducts.layoutManager = gridLayoutManager
             recyclerViewProducts.setHasFixedSize(true)
             recyclerViewProducts.adapter = adapter.withLoadStateFooter(footer = footerAdapter)
@@ -94,15 +95,14 @@ class ProductsFragment : Fragment(R.layout.fragment_products),
         }
 
         viewModel.products.observe(viewLifecycleOwner) { productsPagingData ->
-            adapter.submitData(viewLifecycleOwner.lifecycle,productsPagingData)
+            adapter.submitData(viewLifecycleOwner.lifecycle, productsPagingData)
         }
     }
 
     private fun setupListeners() {
         binding.apply {
             btnRetry.setOnClickListener {
-                // start fetching fresh products
-                adapter.refresh()
+                refreshProducts()
             }
 
             swipeRefreshLayout.setOnRefreshListener(this@ProductsFragment)
@@ -110,24 +110,39 @@ class ProductsFragment : Fragment(R.layout.fragment_products),
 
         adapter.addLoadStateListener { loadState ->
             binding.apply {
-
                 // this means that initial data load call is in progress
-                swipeRefreshLayout.isRefreshing = loadState.source.refresh is LoadState.Loading
+                swipeRefreshLayout.isRefreshing = loadState.mediator?.refresh is LoadState.Loading
 
                 // this means that loading has finished and there is no error
                 // so we need to make the recyclerview visible
-                recyclerViewProducts.isVisible = loadState.source.refresh is LoadState.NotLoading
+                recyclerViewProducts.isVisible =
+                    loadState.prepend is LoadState.NotLoading || loadState.source.refresh is LoadState.NotLoading || loadState.mediator?.refresh is LoadState.NotLoading
 
                 // this means that some error has occurred in the initial data load call
-                val hasErrorOccurred = loadState.source.refresh is LoadState.Error
-                btnRetry.isVisible = hasErrorOccurred
-                txtErrorMessage.isVisible = hasErrorOccurred
-                if(hasErrorOccurred) {
-                    txtErrorMessage.text = util.parseApiErrorThrowable((loadState.source.refresh as LoadState.Error).error)
+                val hasErrorOccurred =
+                    loadState.source.refresh is LoadState.Error || loadState.mediator?.refresh is LoadState.Error
+                btnRetry.isVisible = hasErrorOccurred && adapter.itemCount == 0
+                txtErrorMessage.isVisible = hasErrorOccurred && adapter.itemCount == 0
+                txtErrorMessage.text =
+                    util.parseApiErrorThrowable((loadState.refresh as? LoadState.Error)?.error)
+                if (hasErrorOccurred && adapter.itemCount != 0) {
+                    // this means some error has occurred in refreshing data from the API call
+                    // but data is present in the local db
+                    // so here we show only a toast message
+                    Toast.makeText(
+                        context,
+                        util.parseApiErrorThrowable((loadState.refresh as LoadState.Error).error),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
 
                 // this means there are no products found in the initial data load call
-                if (loadState.source.refresh is LoadState.NotLoading &&
+                // and also no products are present in the local db
+                if (loadState.refresh is LoadState.NotLoading &&
+                    loadState.prepend is LoadState.NotLoading &&
+                    loadState.source.refresh is LoadState.NotLoading &&
+                    loadState.mediator?.refresh is LoadState.NotLoading &&
+                    //loadState.append.endOfPaginationReached &&
                     adapter.itemCount == 0
                 ) {
                     recyclerViewProducts.isVisible = false
@@ -141,9 +156,23 @@ class ProductsFragment : Fragment(R.layout.fragment_products),
 
     // pull to refresh
     override fun onRefresh() {
+        refreshProducts()
+        binding.swipeRefreshLayout.isRefreshing = false
+    }
+
+    private fun refreshProducts() {
+        if (!util.isNetworkAvailable()) {
+            Toast.makeText(
+                context,
+                util.getStringByResId(R.string.please_check_internent),
+                Toast.LENGTH_SHORT
+            ).show()
+            binding.swipeRefreshLayout.isRefreshing = false
+            return
+        }
+
         // start fetching fresh products
         adapter.refresh()
-        binding.swipeRefreshLayout.isRefreshing = false
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

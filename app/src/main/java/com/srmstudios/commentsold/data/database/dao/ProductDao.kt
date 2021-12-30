@@ -1,6 +1,7 @@
 package com.srmstudios.commentsold.data.database.dao
 
 import androidx.lifecycle.LiveData
+import androidx.paging.PagingSource
 import androidx.room.*
 import com.srmstudios.commentsold.data.database.entity.DatabaseProduct
 import kotlinx.coroutines.flow.Flow
@@ -23,8 +24,11 @@ interface ProductDao {
     @Query("delete from product where id = :id")
     suspend fun delete(id: Int)
 
+    /*@Query("select * from product order by id desc")
+    fun getProducts(): LiveData<List<DatabaseProduct>>*/
+
     @Query("select * from product order by id desc")
-    fun getProducts(): LiveData<List<DatabaseProduct>>
+    fun getProducts(): PagingSource<Int, DatabaseProduct>
 
     @Query("select * from product where id = :id")
     fun getProductById(id: Int): Flow<DatabaseProduct?>

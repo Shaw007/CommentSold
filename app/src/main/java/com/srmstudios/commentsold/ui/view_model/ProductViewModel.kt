@@ -3,6 +3,7 @@ package com.srmstudios.commentsold.ui.view_model
 import androidx.lifecycle.*
 import androidx.paging.cachedIn
 import androidx.paging.map
+import com.srmstudios.commentsold.data.database.entity.toProduct
 import com.srmstudios.commentsold.data.network.model.toProduct
 import com.srmstudios.commentsold.data.repo.InventoryRepository
 import com.srmstudios.commentsold.data.repo.ProductRepository
@@ -28,13 +29,15 @@ class ProductViewModel @Inject constructor(
 
     val products = productRepository.getProducts()
         .map { pagingData ->
-            pagingData.map { productResponse ->
-                productResponse.toProduct()
+            pagingData.map { databaseProduct ->
+                databaseProduct.toProduct()
             }
         }.cachedIn(viewModelScope)
 
     fun logout() = viewModelScope.launch {
         productRepository.deleteAllProductsFromDB()
+        productRepository.deleteAllRemoteKeysProductsFromDB()
+        productRepository
         inventoryRepository.deleteAllInventoryFromDB()
         commentSoldPrefsManager.clear()
         _navigateToLoginScreen.value = true
