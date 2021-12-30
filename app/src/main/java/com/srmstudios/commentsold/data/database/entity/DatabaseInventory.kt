@@ -79,6 +79,45 @@ fun List<DatabaseInventory>.toInventory() = map {
     )
 }
 
+fun DatabaseInventoryJoinProduct.toInventoryJoinProduct(): Inventory {
+    return Inventory(
+        id = id,
+        productId = productId,
+        productName = productName,
+        quantity = quantity,
+        color = color,
+        size = size,
+        weight = weight,
+        priceCents = priceCents,
+        salePriceCents = salePriceCents,
+        costCents = costCents,
+        sku = sku,
+        length = length,
+        width = width,
+        height = height,
+        note = note
+    )
+}
+
+fun DatabaseInventoryJoinProduct.toDatabaseInventory(): DatabaseInventory {
+    return DatabaseInventory(
+        id = id,
+        productId = productId,
+        quantity = quantity,
+        color = color,
+        size = size,
+        weight = weight,
+        priceCents = priceCents,
+        salePriceCents = salePriceCents,
+        costCents = costCents,
+        sku = sku,
+        length = length,
+        width = width,
+        height = height,
+        note = note
+    )
+}
+
 fun List<DatabaseInventoryJoinProduct>.toInventoryJoinProduct() = map {
     Inventory(
         id = it.id,

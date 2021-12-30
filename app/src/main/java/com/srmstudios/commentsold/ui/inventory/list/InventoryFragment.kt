@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.srmstudios.commentsold.R
 import com.srmstudios.commentsold.data.database.entity.toInventory
+import com.srmstudios.commentsold.data.database.entity.toInventoryJoinProduct
 import com.srmstudios.commentsold.databinding.FragmentInventoryBinding
 import com.srmstudios.commentsold.ui.adapter.InventoryAdapter
 import com.srmstudios.commentsold.ui.view_model.InventoryViewModel
@@ -75,7 +76,7 @@ class InventoryFragment : Fragment(R.layout.fragment_inventory),
 
         viewModel.inventoryList.observe(viewLifecycleOwner) { result ->
             result.data?.let { inventoryList ->
-                adapter.submitList(inventoryList.toInventory())
+                adapter.submitList(inventoryList.toInventoryJoinProduct())
             }
 
             binding.apply {

@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.srmstudios.commentsold.R
 import com.srmstudios.commentsold.data.database.entity.toInventory
+import com.srmstudios.commentsold.data.database.entity.toInventoryJoinProduct
 import com.srmstudios.commentsold.databinding.FragmentCreateEditInventoryBinding
 import com.srmstudios.commentsold.ui.view_model.InventoryDetailViewModel
 import com.srmstudios.commentsold.util.Resource
@@ -37,7 +38,7 @@ class CreateEditInventoryFragment : Fragment(R.layout.fragment_create_edit_inven
                 binding.btnCreateUpdate.text = getString(R.string.edit)
 
                 viewModel.inventory.observe(viewLifecycleOwner) { databaseProduct ->
-                    databaseProduct?.toInventory()?.let { inventory ->
+                    databaseProduct?.toInventoryJoinProduct()?.let { inventory ->
                         binding.apply {
                             edtQuantity.updateText(inventory.quantity?.toString() ?: "0")
                             edtWeight.updateText(inventory.weight ?: "0")

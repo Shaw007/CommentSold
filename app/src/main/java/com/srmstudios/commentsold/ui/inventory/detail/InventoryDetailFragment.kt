@@ -14,6 +14,7 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.srmstudios.commentsold.R
 import com.srmstudios.commentsold.data.database.entity.toInventory
+import com.srmstudios.commentsold.data.database.entity.toInventoryJoinProduct
 import com.srmstudios.commentsold.databinding.FragmentInventoryDetailBinding
 import com.srmstudios.commentsold.ui.view_model.InventoryDetailViewModel
 import com.srmstudios.commentsold.util.convertCentsToDollars
@@ -39,7 +40,7 @@ class InventoryDetailFragment : Fragment(R.layout.fragment_inventory_detail) {
 
     private fun setupViews() {
         viewModel.inventory.observe(viewLifecycleOwner) { databaseInventory ->
-            databaseInventory?.toInventory()?.let { inventory ->
+            databaseInventory?.toInventoryJoinProduct()?.let { inventory ->
                 binding.apply {
                     txtProductName.text = inventory.productName ?: ""
                     txtColor.text = inventory.color ?: ""

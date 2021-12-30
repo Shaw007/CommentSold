@@ -2,6 +2,7 @@ package com.srmstudios.commentsold.data.repo
 
 import com.srmstudios.commentsold.data.database.CommentSoldDatabase
 import com.srmstudios.commentsold.data.database.entity.DatabaseInventory
+import com.srmstudios.commentsold.data.database.entity.toDatabaseInventory
 import com.srmstudios.commentsold.data.network.ICommentSoldApi
 import com.srmstudios.commentsold.data.network.model.CreateUpdateInventoryRequest
 import com.srmstudios.commentsold.data.network.model.toDatabaseInventory
@@ -22,7 +23,7 @@ class InventoryRepository @Inject constructor(
     fun getInventoryList() = networkBoundResource(
         query = {
             // query local database
-            commentSoldDatabase.inventoryDao().getInventoryList()
+            commentSoldDatabase.inventoryDao().getInventoryListJoinProduct() //.getInventoryList()
         },
         fetch = {
             // fetch inventory list from network
@@ -133,7 +134,7 @@ class InventoryRepository @Inject constructor(
                     )
 
                     commentSoldDatabase.inventoryDao().update(
-                        databaseInventoryUpdate
+                        databaseInventoryUpdate.toDatabaseInventory()
                     )
                 }
         }
