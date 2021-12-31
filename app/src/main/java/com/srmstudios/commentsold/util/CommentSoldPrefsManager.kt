@@ -31,7 +31,7 @@ class CommentSoldPrefsManager @Inject constructor(@ApplicationContext private va
     var jwtToken: String?
         get() = pref.getString(
             PREFS_JWT_TOKEN,
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjYzLCJleHAiOjE2NzI0NDE4NzR9.SWZJkR3b4r9_5dby33lmgDG6jW57hXlbQ2o8S0E6Kqo"
+            ""
         )
         set(token) {
             editor.putString(
