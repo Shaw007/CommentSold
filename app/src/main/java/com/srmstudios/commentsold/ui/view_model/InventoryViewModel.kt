@@ -3,6 +3,7 @@ package com.srmstudios.commentsold.ui.view_model
 import androidx.lifecycle.*
 import com.srmstudios.commentsold.R
 import com.srmstudios.commentsold.data.repo.InventoryRepository
+import com.srmstudios.commentsold.data.repo.ProductRepository
 import com.srmstudios.commentsold.util.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
@@ -12,6 +13,7 @@ import javax.inject.Inject
 @HiltViewModel
 class InventoryViewModel @Inject constructor(
     private val inventoryRepository: InventoryRepository,
+    private val productRepository: ProductRepository,
     private val util: Util
 ) : ViewModel() {
 
@@ -21,6 +23,12 @@ class InventoryViewModel @Inject constructor(
     // So when user taps the Retry button, this mutableLiveData gets triggered
     // and eventually triggers the getInventoryList() method again in InventoryRepository
     private var _triggerFetchInventory = MutableLiveData<TRIGGER>()
+
+    private var _triggerFetchProductColors = MutableLiveData<TRIGGER>()
+
+    private var _selectedColor = MutableLiveData<String?>(null)
+    private var _selectedSize = MutableLiveData<String?>(null)
+    private var _selectedQuantity = MutableLiveData<Int?>(null)
 
     private var _progressBarPagination = MutableLiveData<Boolean>()
     val progressBarPagination: LiveData<Boolean>
@@ -37,11 +45,22 @@ class InventoryViewModel @Inject constructor(
     init {
         // set this for initial call
         _triggerFetchInventory.value = TRIGGER.TRIGGER
+        fetchProductColors()
+    }
+
+    val productColors = _triggerFetchProductColors.switchMap {
+        productRepository.getProductColors().asLiveData()
     }
 
     val inventoryList = _triggerFetchInventory.switchMap {
         // this lambda will be triggered everytime _trigger value gets modified
-        inventoryRepository.getInventoryList()
+        page = 0
+        allInventoryLoaded = false
+        inventoryRepository.getInventoryList(
+            color = _selectedColor?.value,
+            size = _selectedSize?.value,
+            quantity = if (_selectedQuantity?.value == null) null else "<${_selectedQuantity.value}"
+        )
     }
 
     fun loadMore() = viewModelScope.launch {
@@ -55,20 +74,27 @@ class InventoryViewModel @Inject constructor(
         isLoadMoreInProgress = true
         page++
 
-        inventoryRepository.loadMoreInventory(page).collect { result ->
-            _progressBarPagination.value = result is Resource.Loading
+        inventoryRepository.loadMoreInventory(
+            page = page,
+            color = _selectedColor?.value,
+            size = _selectedSize?.value,
+            quantity = if (_selectedQuantity?.value == null) null else "<${_selectedQuantity.value}"
+        )
+            .collect { result ->
+                _progressBarPagination.value = result is Resource.Loading
 
-            when (result) {
-                is Resource.Success -> {
-                    allInventoryLoaded = result.data?.inventory?.isNullOrEmpty() == true
-                    isLoadMoreInProgress = false
-                }
-                is Resource.Error -> {
-                    page--
-                    isLoadMoreInProgress = false
+                when (result) {
+                    is Resource.Success -> {
+                        allInventoryLoaded =
+                            result.data?.inventory?.size ?: PAGE_SIZE_INVENTORY < PAGE_SIZE_INVENTORY
+                        isLoadMoreInProgress = false
+                    }
+                    is Resource.Error -> {
+                        page--
+                        isLoadMoreInProgress = false
+                    }
                 }
             }
-        }
     }
 
     fun fetchInventoryList(): Boolean {
@@ -76,11 +102,32 @@ class InventoryViewModel @Inject constructor(
             _message.value = util.getStringByResId(R.string.please_check_internent)
             return false
         } else {
-            page = 0
-            allInventoryLoaded = false
             _triggerFetchInventory.value = TRIGGER.TRIGGER
             true
         }
+    }
+
+    fun fetchProductColors() {
+        if (!util.isNetworkAvailable()) {
+            _message.value = util.getStringByResId(R.string.please_check_internent)
+            return
+        }
+        _triggerFetchProductColors.value = TRIGGER.TRIGGER
+    }
+
+    fun setSelectedColor(color: String?) {
+        _selectedColor.value = color
+        _triggerFetchInventory.value = TRIGGER.TRIGGER
+    }
+
+    fun setSelectedSize(size: String?) {
+        _selectedSize.value = size
+        _triggerFetchInventory.value = TRIGGER.TRIGGER
+    }
+
+    fun setSelectedQuantity(quantity: String?) {
+        _selectedQuantity.value = quantity?.toIntOrNull()
+        _triggerFetchInventory.value = TRIGGER.TRIGGER
     }
 
     fun doneShowingMessage() {

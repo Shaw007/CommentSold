@@ -20,14 +20,19 @@ class InventoryRepository @Inject constructor(
     @CommentSoldAuthApi private val iCommentSoldApi: ICommentSoldApi,
     private val commentSoldDatabase: CommentSoldDatabase
 ) {
-    fun getInventoryList() = networkBoundResource(
+    fun getInventoryList(color: String? = null, size: String? = null, quantity: String? = null) = networkBoundResource(
         query = {
             // query local database
-            commentSoldDatabase.inventoryDao().getInventoryListJoinProduct() //.getInventoryList()
+            commentSoldDatabase.inventoryDao().getInventoryListJoinProduct()
         },
         fetch = {
             // fetch inventory list from network
-            iCommentSoldApi.getInventoryList(page = FIRST_PAGE_INVENTORY_OFFSET)
+            iCommentSoldApi.getInventoryList(
+                page = FIRST_PAGE_INVENTORY_OFFSET,
+                color = color,
+                size = size,
+                quantity = quantity
+            )
         },
         saveFetchResult = {
             // save fetched inventory list from the network to local database
@@ -40,10 +45,15 @@ class InventoryRepository @Inject constructor(
         }
     )
 
-    fun loadMoreInventory(page: Int) = flow {
+    fun loadMoreInventory(page: Int, color: String? = null, size: String? = null, quantity: String? = null) = flow {
         try {
             emit(Resource.Loading(null))
-            val response = iCommentSoldApi.getInventoryList(page = page)
+            val response = iCommentSoldApi.getInventoryList(
+                page = page,
+                color = color,
+                size = size,
+                quantity = quantity
+            )
             response.inventory?.let { inventory ->
                 commentSoldDatabase.inventoryDao().insert(inventory.toDatabaseInventory())
             }
@@ -158,17 +168,6 @@ class InventoryRepository @Inject constructor(
             // when deleted on the server
             commentSoldDatabase.inventoryDao().delete(id)
         }
-
-    fun getProductColors() = flow {
-        try {
-            emit(Resource.Loading(null))
-            val response = iCommentSoldApi.getProductColors()
-            emit(Resource.Success(response))
-        } catch (ex: Throwable) {
-            ex.printStackTrace()
-            emit(Resource.Error(ex, null))
-        }
-    }
 
     suspend fun deleteAllInventoryFromDB() = withContext(Dispatchers.IO) {
         commentSoldDatabase.inventoryDao().deleteAllInventory()

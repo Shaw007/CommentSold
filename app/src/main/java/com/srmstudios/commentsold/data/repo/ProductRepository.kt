@@ -152,6 +152,17 @@ class ProductRepository @Inject constructor(
         }
     }
 
+    fun getProductColors() = flow {
+        try {
+            emit(Resource.Loading(null))
+            val response = iCommentSoldApi.getProductColors()
+            emit(Resource.Success(response))
+        } catch (ex: Throwable) {
+            ex.printStackTrace()
+            emit(Resource.Error(ex, null))
+        }
+    }
+
     suspend fun deleteAllProductsFromDB() = withContext(Dispatchers.IO) {
         commentSoldDatabase.productDao().deleteAllProducts()
     }

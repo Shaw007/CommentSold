@@ -4,6 +4,7 @@ import androidx.lifecycle.*
 import com.srmstudios.commentsold.R
 import com.srmstudios.commentsold.data.network.model.CreateUpdateInventoryRequest
 import com.srmstudios.commentsold.data.repo.InventoryRepository
+import com.srmstudios.commentsold.data.repo.ProductRepository
 import com.srmstudios.commentsold.ui.model.Inventory
 import com.srmstudios.commentsold.util.*
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,6 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class InventoryDetailViewModel @Inject constructor(
+    private val productRepository: ProductRepository,
     private val inventoryRepository: InventoryRepository,
     private val savedStateHandle: SavedStateHandle, // this is used to fetch NavArgs provided to the Destination
     private val util: Util
@@ -54,7 +56,7 @@ class InventoryDetailViewModel @Inject constructor(
     }
 
     val productColors = _triggerFetchProductColors.switchMap {
-        inventoryRepository.getProductColors().asLiveData()
+        productRepository.getProductColors().asLiveData()
     }
 
     fun createEditInventory(

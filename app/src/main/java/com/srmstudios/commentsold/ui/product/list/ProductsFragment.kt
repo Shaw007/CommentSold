@@ -77,18 +77,24 @@ class ProductsFragment : Fragment(R.layout.fragment_products),
         }
 
         viewModel.products.observe(viewLifecycleOwner) { result ->
-            result.data?.let { products ->
-                adapter.submitList(products.toProducts())
-            }
-
             binding.apply {
+                result.data?.let { products ->
+                    adapter.submitList(products.toProducts())
+                }
+
                 swipeRefreshLayout.isRefreshing =
                     result is Resource.Loading && result.data.isNullOrEmpty()
 
                 val showErrorViews = result is Resource.Error && result.data.isNullOrEmpty()
-                txtErrorMessage.isVisible = showErrorViews
-                btnRetry.isVisible = showErrorViews
-                txtErrorMessage.text = result.error?.message
+                val showEmptyDataViews = result is Resource.Success && result.data.isNullOrEmpty()
+
+                txtErrorMessage.isVisible = showErrorViews || showEmptyDataViews
+                btnRetry.isVisible = showErrorViews || showEmptyDataViews
+                if(showEmptyDataViews){
+                    txtErrorMessage.text = getString(R.string.no_products_found)
+                }else {
+                    txtErrorMessage.text = result.error?.message
+                }
             }
         }
     }

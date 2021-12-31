@@ -51,7 +51,11 @@ class Util @Inject constructor(
                 messageToShow
             }
             is IOException -> {
-                applicationContext.getString(R.string.weak_internet_connection)
+                if(isNetworkAvailable()){
+                    applicationContext.getString(R.string.please_check_internent)
+                }else {
+                    applicationContext.getString(R.string.weak_internet_connection)
+                }
             }
             else -> {
                 applicationContext.getString(R.string.something_went_wrong)
