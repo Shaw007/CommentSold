@@ -75,4 +75,6 @@
     <string name="weak_internet_connection">Weak internet connection</string>
     <string name="no_products_found">No Products found</string>
     <string name="no_inventory_found">No Inventory found</string>
+    <string name="product">Product</string>
+    <string name="product_selection_message">Select a product</string>
 </resources>

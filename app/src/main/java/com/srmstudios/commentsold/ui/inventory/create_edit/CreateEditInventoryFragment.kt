@@ -11,7 +11,9 @@ import androidx.fragment.app.viewModels
 import com.srmstudios.commentsold.R
 import com.srmstudios.commentsold.data.database.entity.toInventory
 import com.srmstudios.commentsold.data.database.entity.toInventoryJoinProduct
+import com.srmstudios.commentsold.data.database.entity.toProducts
 import com.srmstudios.commentsold.databinding.FragmentCreateEditInventoryBinding
+import com.srmstudios.commentsold.ui.model.Product
 import com.srmstudios.commentsold.ui.view_model.InventoryDetailViewModel
 import com.srmstudios.commentsold.util.Resource
 import com.srmstudios.commentsold.util.productSizes
@@ -63,6 +65,17 @@ class CreateEditInventoryFragment : Fragment(R.layout.fragment_create_edit_inven
             }
         }
 
+        viewModel.products.observe(viewLifecycleOwner) { databaseProducts ->
+            context?.let {
+                val productsAdapter = ArrayAdapter(
+                    it,
+                    R.layout.product_style_item,
+                    databaseProducts.toProducts()
+                )
+                (binding.tilProducts.editText as? AutoCompleteTextView)?.setAdapter(productsAdapter)
+            }
+        }
+
         viewModel.productColors.observe(viewLifecycleOwner) { result ->
             result.data?.colors?.let { productColors ->
                 val colorsAdapter = ArrayAdapter(
@@ -106,6 +119,13 @@ class CreateEditInventoryFragment : Fragment(R.layout.fragment_create_edit_inven
         binding.apply {
             btnRetryColors.setOnClickListener {
                 viewModel.fetchProductColors()
+            }
+
+            (binding.tilProducts.editText as? AutoCompleteTextView)?.setOnItemClickListener { parent, _, position, _ ->
+                val product = parent.getItemAtPosition(position) as? Product?
+                product?.let {
+                    viewModel.setSelectedProductId(it.id)
+                }
             }
 
             btnCreateUpdate.setOnClickListener {

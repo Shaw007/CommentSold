@@ -5,6 +5,7 @@ import com.srmstudios.commentsold.data.database.entity.DatabaseInventory
 import com.srmstudios.commentsold.data.database.entity.toDatabaseInventory
 import com.srmstudios.commentsold.data.network.ICommentSoldApi
 import com.srmstudios.commentsold.data.network.model.CreateUpdateInventoryRequest
+import com.srmstudios.commentsold.data.network.model.InventoryListMainResponse
 import com.srmstudios.commentsold.data.network.model.toDatabaseInventory
 import com.srmstudios.commentsold.di.CommentSoldAuthApi
 import com.srmstudios.commentsold.util.FIRST_PAGE_INVENTORY_OFFSET
@@ -20,19 +21,27 @@ class InventoryRepository @Inject constructor(
     @CommentSoldAuthApi private val iCommentSoldApi: ICommentSoldApi,
     private val commentSoldDatabase: CommentSoldDatabase
 ) {
-    fun getInventoryList(color: String? = null, size: String? = null, quantity: String? = null) = networkBoundResource(
+    fun getInventoryList(productId: Int? = null, color: String? = null, size: String? = null, quantity: String? = null) = networkBoundResource(
         query = {
             // query local database
-            commentSoldDatabase.inventoryDao().getInventoryListJoinProduct()
+            if(productId == null) {
+                commentSoldDatabase.inventoryDao().getInventoryListJoinProduct()
+            }else{
+                commentSoldDatabase.inventoryDao().getInventoryListJoinProduct(productId)
+            }
         },
         fetch = {
             // fetch inventory list from network
-            iCommentSoldApi.getInventoryList(
-                page = FIRST_PAGE_INVENTORY_OFFSET,
-                color = color,
-                size = size,
-                quantity = quantity
-            )
+            if(productId == null){
+                iCommentSoldApi.getInventoryList(
+                    page = FIRST_PAGE_INVENTORY_OFFSET,
+                    color = color,
+                    size = size,
+                    quantity = quantity
+                )
+            }else {
+                InventoryListMainResponse()
+            }
         },
         saveFetchResult = {
             // save fetched inventory list from the network to local database

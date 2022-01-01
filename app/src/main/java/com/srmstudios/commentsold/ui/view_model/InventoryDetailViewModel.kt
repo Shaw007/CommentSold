@@ -30,6 +30,8 @@ class InventoryDetailViewModel @Inject constructor(
     val inventoryDeleted: LiveData<Boolean>
         get() = _inventoryDeleted
 
+    private var _selectedProductId = MutableLiveData<Int?>(null)
+
     private var _message = MutableLiveData<String?>()
     val message: LiveData<String?>
         get() = _message
@@ -55,6 +57,8 @@ class InventoryDetailViewModel @Inject constructor(
         inventoryRepository.getInventory(inventoryId).asLiveData()
     }
 
+    val products = productRepository.getAllProductsFromDB()
+
     val productColors = _triggerFetchProductColors.switchMap {
         productRepository.getProductColors().asLiveData()
     }
@@ -74,6 +78,10 @@ class InventoryDetailViewModel @Inject constructor(
     ) {
         if (!util.isNetworkAvailable()) {
             _message.value = util.getStringByResId(R.string.please_check_internent)
+            return
+        }
+        if (_selectedProductId?.value == null || _selectedProductId.value == -1) {
+            _message.value = util.getStringByResId(R.string.product_selection_message)
             return
         }
         if (color.isNullOrEmpty()) {
@@ -120,7 +128,7 @@ class InventoryDetailViewModel @Inject constructor(
 
 
         val createUpdateInventoryRequest = CreateUpdateInventoryRequest(
-            productId = 11012, // testing
+            productId = _selectedProductId.value!!, //11012, // testing
             quantity = quantity.toInt(),
             color = color,
             size = size,
@@ -196,7 +204,8 @@ class InventoryDetailViewModel @Inject constructor(
                                 _message.value =
                                     util.getStringByResId(R.string.inventory_updated_mesg)
                             } else {
-                                _message.value = util.getStringByResId(R.string.something_went_wrong)
+                                _message.value =
+                                    util.getStringByResId(R.string.something_went_wrong)
                             }
                         }
                         is Resource.Error -> {
@@ -231,7 +240,8 @@ class InventoryDetailViewModel @Inject constructor(
                                     util.getStringByResId(R.string.inventory_deleted_mesg)
                                 _inventoryDeleted.value = true
                             } else {
-                                _message.value = util.getStringByResId(R.string.something_went_wrong)
+                                _message.value =
+                                    util.getStringByResId(R.string.something_went_wrong)
                             }
                         }
                         is Resource.Error -> {
@@ -250,6 +260,10 @@ class InventoryDetailViewModel @Inject constructor(
             return
         }
         _triggerFetchProductColors.value = TRIGGER.TRIGGER
+    }
+
+    fun setSelectedProductId(productId: Int?) {
+        _selectedProductId.value = productId
     }
 
     fun doneShowingMessage() {

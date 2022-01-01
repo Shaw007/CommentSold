@@ -53,6 +53,8 @@ class ProductRepository @Inject constructor(
         }
     }
 
+    fun getAllProductsFromDB() = commentSoldDatabase.productDao().getProducts()
+
     fun getProduct(id: Int) = commentSoldDatabase.productDao().getProductById(id)
 
     fun createProduct(

@@ -19,8 +19,10 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.srmstudios.commentsold.R
 import com.srmstudios.commentsold.data.database.entity.toInventoryJoinProduct
+import com.srmstudios.commentsold.data.database.entity.toProducts
 import com.srmstudios.commentsold.databinding.FragmentInventoryBinding
 import com.srmstudios.commentsold.ui.adapter.InventoryAdapter
+import com.srmstudios.commentsold.ui.model.Product
 import com.srmstudios.commentsold.ui.view_model.InventoryViewModel
 import com.srmstudios.commentsold.util.Resource
 import com.srmstudios.commentsold.util.Util
@@ -43,7 +45,7 @@ class InventoryFragment : Fragment(R.layout.fragment_inventory),
         // can select a product and add the inventory against it
         // skipping this optional task
 
-        //setHasOptionsMenu(true)
+        setHasOptionsMenu(true)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -78,6 +80,17 @@ class InventoryFragment : Fragment(R.layout.fragment_inventory),
             message?.let {
                 Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
                 viewModel.doneShowingMessage()
+            }
+        }
+
+        viewModel.products.observe(viewLifecycleOwner) { products ->
+            context?.let {
+                val adapter = ArrayAdapter(
+                    it,
+                    R.layout.product_style_item,
+                    products.toProducts()
+                )
+                (binding.tilProducts.editText as? AutoCompleteTextView?)?.setAdapter(adapter)
             }
         }
 
@@ -133,17 +146,24 @@ class InventoryFragment : Fragment(R.layout.fragment_inventory),
 
     private fun setupListeners() {
         binding.apply {
-            (binding.tilColors.editText as? AutoCompleteTextView)?.setOnItemClickListener { parent, view, position, id ->
+            (tilProducts.editText as? AutoCompleteTextView?)?.setOnItemClickListener { adapterView, _, position, _ ->
+                val product = adapterView.getItemAtPosition(position) as? Product
+                product?.let {
+                    viewModel.setSelectedProduct(it)
+                }
+            }
+
+            (tilColors.editText as? AutoCompleteTextView)?.setOnItemClickListener { parent, view, position, id ->
                 val color = parent.getItemAtPosition(position) as String?
                 viewModel.setSelectedColor(color)
             }
 
-            (binding.tilSize.editText as? AutoCompleteTextView)?.setOnItemClickListener { parent, view, position, id ->
+            (tilSize.editText as? AutoCompleteTextView)?.setOnItemClickListener { parent, view, position, id ->
                 val size = parent.getItemAtPosition(position) as String?
                 viewModel.setSelectedSize(size)
             }
 
-            binding.edtQuantity.addTextChangedListener(object : TextWatcher{
+            edtQuantity.addTextChangedListener(object : TextWatcher{
                 override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
                 override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {

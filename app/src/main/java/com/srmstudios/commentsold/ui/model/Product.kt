@@ -18,4 +18,8 @@ data class Product(
     var shippingPrice: Int? = null,
     var note: String? = null,
     var adminId: Int? = null
-) : Parcelable
+) : Parcelable {
+    override fun toString(): String {
+        return productName ?: ""
+    }
+}

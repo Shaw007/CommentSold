@@ -4,6 +4,7 @@ import androidx.lifecycle.*
 import com.srmstudios.commentsold.R
 import com.srmstudios.commentsold.data.repo.InventoryRepository
 import com.srmstudios.commentsold.data.repo.ProductRepository
+import com.srmstudios.commentsold.ui.model.Product
 import com.srmstudios.commentsold.util.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
@@ -26,6 +27,7 @@ class InventoryViewModel @Inject constructor(
 
     private var _triggerFetchProductColors = MutableLiveData<TRIGGER>()
 
+    private var _selectedProduct = MutableLiveData<Product?>(null)
     private var _selectedColor = MutableLiveData<String?>(null)
     private var _selectedSize = MutableLiveData<String?>(null)
     private var _selectedQuantity = MutableLiveData<Int?>(null)
@@ -48,6 +50,8 @@ class InventoryViewModel @Inject constructor(
         fetchProductColors()
     }
 
+    val products = productRepository.getAllProductsFromDB()
+
     val productColors = _triggerFetchProductColors.switchMap {
         productRepository.getProductColors().asLiveData()
     }
@@ -57,6 +61,7 @@ class InventoryViewModel @Inject constructor(
         page = 0
         allInventoryLoaded = false
         inventoryRepository.getInventoryList(
+            productId = _selectedProduct.value?.id,
             color = _selectedColor?.value,
             size = _selectedSize?.value,
             quantity = if (_selectedQuantity?.value == null) null else "<${_selectedQuantity.value}"
@@ -113,6 +118,11 @@ class InventoryViewModel @Inject constructor(
             return
         }
         _triggerFetchProductColors.value = TRIGGER.TRIGGER
+    }
+
+    fun setSelectedProduct(product: Product){
+        _selectedProduct.value = product
+        _triggerFetchInventory.value = TRIGGER.TRIGGER
     }
 
     fun setSelectedColor(color: String?) {
