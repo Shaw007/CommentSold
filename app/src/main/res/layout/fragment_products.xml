@@ -21,8 +21,6 @@
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:padding="@dimen/product_grid_item_margin"
-            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-            app:spanCount="2"
             tools:listitem="@layout/item_product" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

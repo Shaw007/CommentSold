@@ -17,6 +17,7 @@ import com.srmstudios.commentsold.R
 import com.srmstudios.commentsold.data.database.entity.toProducts
 import com.srmstudios.commentsold.databinding.FragmentProductsBinding
 import com.srmstudios.commentsold.ui.adapter.ProductAdapter
+import com.srmstudios.commentsold.ui.model.Product
 import com.srmstudios.commentsold.ui.view_model.ProductViewModel
 import com.srmstudios.commentsold.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
@@ -27,6 +28,7 @@ class ProductsFragment : Fragment(R.layout.fragment_products),
     SwipeRefreshLayout.OnRefreshListener {
     private lateinit var binding: FragmentProductsBinding
     private lateinit var adapter: ProductAdapter
+    private lateinit var gridLayoutManager: GridLayoutManager
     private val viewModel: ProductViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,6 +45,8 @@ class ProductsFragment : Fragment(R.layout.fragment_products),
     }
 
     private fun setupViews() {
+        gridLayoutManager = GridLayoutManager(context, 2)
+
         adapter = ProductAdapter { product ->
             findNavController().navigate(
                 ProductsFragmentDirections.actionProductsFragmentToProductDetailFragment(
@@ -55,11 +59,8 @@ class ProductsFragment : Fragment(R.layout.fragment_products),
         binding.apply {
             swipeRefreshLayout.setOnRefreshListener(this@ProductsFragment)
             recyclerViewProducts.setHasFixedSize(true)
+            recyclerViewProducts.layoutManager = gridLayoutManager
             recyclerViewProducts.adapter = adapter
-        }
-
-        viewModel.progressBarPagination.observe(viewLifecycleOwner) { visibility ->
-            binding.progressBarPagination.isVisible = visibility
         }
 
         viewModel.message.observe(viewLifecycleOwner) { message ->
@@ -90,11 +91,23 @@ class ProductsFragment : Fragment(R.layout.fragment_products),
 
                 txtErrorMessage.isVisible = showErrorViews || showEmptyDataViews
                 btnRetry.isVisible = showErrorViews || showEmptyDataViews
-                if(showEmptyDataViews){
+                if (showEmptyDataViews) {
                     txtErrorMessage.text = getString(R.string.no_products_found)
-                }else {
+                } else {
                     txtErrorMessage.text = result.error?.message
                 }
+            }
+        }
+
+        viewModel.isLoadMoreInProgress.observe(viewLifecycleOwner) { isLoadMoreInProgress ->
+            if(isLoadMoreInProgress) {
+                val updatedProducts = adapter.currentList.toMutableList()
+                updatedProducts.add(Product(id = -1))
+                adapter.submitList(updatedProducts)
+            }else{
+                val updatedProducts = adapter.currentList.toMutableList()
+                updatedProducts.removeAll { it.id == -1 }
+                adapter.submitList(updatedProducts)
             }
         }
     }
@@ -102,6 +115,19 @@ class ProductsFragment : Fragment(R.layout.fragment_products),
     private fun setupListeners() {
         binding.btnRetry.setOnClickListener {
             viewModel.fetchProducts()
+        }
+
+        gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return when (adapter.getItemViewType(position)) {
+                    ProductAdapter.ITEM_LOADING -> {
+                        2
+                    }
+                    else -> {
+                        1
+                    }
+                }
+            }
         }
 
         binding.recyclerViewProducts.addOnScrollListener(object : RecyclerView.OnScrollListener() {

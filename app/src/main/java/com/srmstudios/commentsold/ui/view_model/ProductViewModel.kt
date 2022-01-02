@@ -25,10 +25,6 @@ class ProductViewModel @Inject constructor(
     // and eventually triggers the getProducts() method again in ProductRepository
     private var _triggerFetchProducts = MutableLiveData<TRIGGER>()
 
-    private var _progressBarPagination = MutableLiveData<Boolean>()
-    val progressBarPagination: LiveData<Boolean>
-        get() = _progressBarPagination
-
     private var _navigateToLoginScreen = MutableLiveData<Boolean>()
     val navigateToLoginScreen: LiveData<Boolean>
         get() = _navigateToLoginScreen
@@ -37,8 +33,11 @@ class ProductViewModel @Inject constructor(
     val message: LiveData<String?>
         get() = _message
 
+    private var _isLoadMoreInProgress = MutableLiveData(false)
+    val isLoadMoreInProgress: LiveData<Boolean>
+        get() = _isLoadMoreInProgress
+
     private var page = FIRST_PAGE_PRODUCTS_OFFSET
-    private var isLoadMoreInProgress = false
     private var allProductsLoaded = false
 
     init {
@@ -52,27 +51,26 @@ class ProductViewModel @Inject constructor(
     }
 
     fun loadMore() = viewModelScope.launch {
-        if (isLoadMoreInProgress || allProductsLoaded) return@launch
+        if (_isLoadMoreInProgress.value == true || allProductsLoaded) return@launch
 
         if (!util.isNetworkAvailable()) {
             _message.value = util.getStringByResId(R.string.please_check_internent)
             return@launch
         }
 
-        isLoadMoreInProgress = true
+        _isLoadMoreInProgress.value = true
         page++
 
         productRepository.loadMoreProducts(page).collect { result ->
-            _progressBarPagination.value = result is Resource.Loading
 
             when (result) {
                 is Resource.Success -> {
                     allProductsLoaded = result.data?.products?.isNullOrEmpty() == true
-                    isLoadMoreInProgress = false
+                    _isLoadMoreInProgress.value = false
                 }
                 is Resource.Error -> {
                     page--
-                    isLoadMoreInProgress = false
+                    _isLoadMoreInProgress.value = false
                 }
             }
         }
