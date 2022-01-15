@@ -25,11 +25,11 @@ data class ProductResponse(
 )
 
 data class CreateUpdateProductRequest(
-    @SerializedName("name") var name: String? = null,
+    @SerializedName("product_name") var name: String? = null,
     @SerializedName("description") var description: String? = null,
     @SerializedName("style") var style: String? = null,
     @SerializedName("brand") var brand: String? = null,
-    @SerializedName("shipping_price_cents") var shippingPriceCents: Int? = null
+    @SerializedName("shipping_price") var shippingPriceCents: Int? = null
 )
 
 data class CreateUpdateDeleteProductResponse(
